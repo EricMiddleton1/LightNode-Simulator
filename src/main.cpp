@@ -1,9 +1,12 @@
 #include "LightNode/LightNode.hpp"
-#include "StripDebug.hpp"
+#include "StripVisual.hpp"
 
 #define LED_COUNT		(32)
 
 using namespace std;
+
+#define WINDOW_WIDTH	800
+#define WINDOW_HEIGHT	600
 
 int main(int argc, char* argv[]) {
 	int ledCount = LED_COUNT;
@@ -17,11 +20,12 @@ int main(int argc, char* argv[]) {
 		cout << "[Info] Using default LED count " << ledCount << endl;
 	}
 
-	LightNode lightNode(Communicator::NodeType::DIGITAL,
-		make_shared<StripDebug>(ledCount, StripDebug::DebugLevel::FULL));
+	auto strip = make_shared<StripVisual>(ledCount, WINDOW_WIDTH, WINDOW_HEIGHT);
 
-	while(1) {
-		this_thread::sleep_for(chrono::seconds(1000));
+	LightNode lightNode(Communicator::NodeType::DIGITAL, strip);
+
+	while(strip->windowUpdate()) {
+		this_thread::sleep_for(chrono::milliseconds(1));
 	}
 
 	return 0;
