@@ -1,31 +1,45 @@
 #include "LightNode/LightNode.hpp"
-#include "StripVisual.hpp"
 
-#define LED_COUNT		(32)
+#include "VirtualStripDigital.hpp"
+#include "VirtualStripAnalog.hpp"
 
-using namespace std;
-
-#define WINDOW_WIDTH	800
-#define WINDOW_HEIGHT	600
 
 int main(int argc, char* argv[]) {
-	int ledCount = LED_COUNT;
+	std::vector<std::shared_ptr<VirtualStrip>> virtualStrips;
+	
+	if(argc < 2) {
+		std::cout << "Usage: " << argv[0]
+			<< " AnalogCount [DigitalStrip1] [DigitalStrip2] ..." << std::endl;
 
-	if(argc == 2) {
-		ledCount = stoi(argv[1]);
-
-		cout << "[Info] LED count " << ledCount << endl;
-	}
-	else {
-		cout << "[Info] Using default LED count " << ledCount << endl;
+		return 1;
 	}
 
-	auto strip = make_shared<StripVisual>(ledCount, WINDOW_WIDTH, WINDOW_HEIGHT);
+	for(int i = 0; i < std::stoi(argv[1]); ++i) {
+		virtualStrips.push_back(std::make_shared<VirtualStripAnalog>());
+	}
 
-	LightNode lightNode(Communicator::NodeType::DIGITAL, strip);
+	for(int i = 2; i < argc; ++i) {
+		virtualStrips.push_back(std::make_shared<VirtualStripDigital>(std::stoi(argv[i])));
+	}
 
-	while(strip->windowUpdate()) {
-		this_thread::sleep_for(chrono::milliseconds(1));
+	std::vector<std::shared_ptr<LightStrip>> lightStrips;
+	for(auto strip : virtualStrips) {
+		lightStrips.push_back(strip);
+	}
+
+	LightNode lightNode(lightStrips, "LightNode Simulator");
+
+	while(true) {
+		bool run = true;
+
+		for(auto strip : virtualStrips) {
+			run &= strip->windowUpdate();
+		}
+
+		if(!run)
+			break;
+
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 
 	return 0;
