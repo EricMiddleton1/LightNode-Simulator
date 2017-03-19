@@ -6,8 +6,8 @@ size_t VirtualStripAnalog::stripCount = 0;
 
 
 VirtualStripAnalog::VirtualStripAnalog()
-	:	VirtualStrip(LightStrip::Type::Analog, 1,
-		"Analog Strip " + std::to_string(stripCount++), LEDS_PER_STRIP, 1) {
+	:	LightStrip(LightStrip::Type::Analog, 1) 
+	,	VirtualStrip( "Analog Strip " + std::to_string(stripCount++), LEDS_PER_STRIP, 1) {
 }
 
 void VirtualStripAnalog::update() {

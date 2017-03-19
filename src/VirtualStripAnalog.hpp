@@ -4,7 +4,7 @@
 #include "VirtualStrip.hpp"
 
 
-class VirtualStripAnalog : public VirtualStrip
+class VirtualStripAnalog : public VirtualStrip<>
 {
 public:
 	VirtualStripAnalog();

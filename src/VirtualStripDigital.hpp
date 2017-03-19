@@ -4,7 +4,7 @@
 #include "VirtualStrip.hpp"
 
 
-class VirtualStripDigital : public VirtualStrip
+class VirtualStripDigital : public VirtualStrip<>
 {
 public:
 	VirtualStripDigital(size_t ledCount);

@@ -7,8 +7,8 @@
 constexpr size_t VirtualStripDigital::LEDS_PER_LINE;
 
 VirtualStripDigital::VirtualStripDigital(size_t _ledCount)
-	:	VirtualStrip(LightStrip::Type::Digital, _ledCount,
-		"Digital Strip - " + std::to_string(_ledCount) + " LEDs",
+	:	LightStrip(LightStrip::Type::Digital, _ledCount)
+	,	VirtualStrip("Digital Strip - " + std::to_string(_ledCount) + " LEDs",
 		std::min(_ledCount, LEDS_PER_LINE), 1 + (_ledCount-1) / LEDS_PER_LINE) {
 }
 
