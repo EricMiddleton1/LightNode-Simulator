@@ -10,6 +10,14 @@ StripWindow::StripWindow(const std::string& _name, size_t _width, size_t _height
 	,	height{_height} {
 }
 
+size_t StripWindow::getWidth() const {
+	return width;
+}
+
+size_t StripWindow::getHeight() const {
+	return height;
+}
+
 bool StripWindow::windowUpdate() {
 
 	sf::Event event;

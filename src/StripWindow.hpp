@@ -12,6 +12,9 @@ class StripWindow
 public:
 	StripWindow(const std::string& name, size_t width, size_t height);
 
+	size_t getWidth() const;
+	size_t getHeight() const;
+
 	//SFML has a problem with the window event loop
 	//running in any thread other than the main thread.
 	//So, you have to call this often from the main thread

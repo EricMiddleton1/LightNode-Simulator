@@ -1,74 +1,70 @@
+#include <iostream>
+#include <vector>
+#include <memory>
+#include <string>
+
 #include "LightNode/LightNode.hpp"
+#include "LightNode/Light.hpp"
 
-#include "VirtualStripMatrix.hpp"
-#include "VirtualStripDigital.hpp"
-#include "VirtualStripAnalog.hpp"
+#include "VirtualLight.hpp"
 
+using namespace std;
 
 int main(int argc, char* argv[]) {
-	std::vector<std::shared_ptr<VirtualStrip<>>> virtualStrips;
-	std::vector<std::shared_ptr<VirtualStripMatrix>> virtualMatrices;
+	vector<std::shared_ptr<Light>> lights;
 	
 	if(argc < 4) {
-		std::cout << "Usage: " << argv[0]
+		cout << "Usage: " << argv[0]
 			<< " AnalogCount DigitalCount MatrixCount "
-			"[DigitalCount1] [DigitalCount2] ... [MatrixWidth1 MatrixHeight1] ..." << std::endl;
+			"[DigitalCount1] [DigitalCount2] ... [MatrixWidth1 MatrixHeight1] ..." << endl;
 
 		return 1;
 	}
 
 	uint8_t analogCount, digitalCount, matrixCount;
 
-	analogCount = std::atoi(argv[1]);
-	digitalCount = std::atoi(argv[2]);
-	matrixCount = std::atoi(argv[3]);
+	analogCount = atoi(argv[1]);
+	digitalCount = atoi(argv[2]);
+	matrixCount = atoi(argv[3]);
 
 	if(argc != (4 + digitalCount + 2*matrixCount)) {
-		std::cout << "Error: Invalid parameters" << std::endl;
+		cout << "Error: Invalid parameters" << endl;
 
 		return 1;
 	}
 
 	for(int i = 0; i < analogCount; ++i) {
-		virtualStrips.push_back(std::make_shared<VirtualStripAnalog>());
+		lights.push_back(make_shared<VirtualLight>(string("Analog ") + to_string(i+1),
+			1, 1, 1));
 	}
 
 	for(int i = 0; i < digitalCount; ++i) {
-		virtualStrips.push_back(std::make_shared<VirtualStripDigital>
-			(std::stoi(argv[i+4])));
+		lights.push_back(make_shared<VirtualLight>(
+			string("Digital ") + to_string(i+1), stoi(argv[i+4]), stoi(argv[i+4]), 1));
 	}
 
 	for(int i = 0; i < matrixCount; ++i) {
 		int index = 4 + digitalCount + 2*i;
 
-		virtualMatrices.push_back(std::make_shared<VirtualStripMatrix>
-			(std::stoi(argv[index]), std::stoi(argv[index+1])));
+		int width = stoi(argv[index]), height = stoi(argv[index+1]);
+
+		lights.push_back(std::make_shared<VirtualLight>
+			(string("Matrix ") + to_string(i+1), width*height, width, height));
 	}
 
-	std::vector<std::shared_ptr<LightStrip>> lightStrips;
-	for(auto strip : virtualStrips) {
-		lightStrips.push_back(strip);
-	}
-	for(auto strip : virtualMatrices) {
-		lightStrips.push_back(strip);
-	}
-
-	LightNode lightNode(lightStrips, "LightNode-Simulator");
+	LightNode lightNode(lights, "LightNode-Simulator");
 
 	while(true) {
 		bool run = true;
 
-		for(auto strip : virtualStrips) {
-			run &= strip->windowUpdate();
-		}
-		for(auto strip : virtualMatrices) {
-			run &= strip->windowUpdate();
+		for(auto light : lights) {
+			run &= dynamic_pointer_cast<VirtualLight>(light)->windowUpdate();
 		}
 
 		if(!run)
 			break;
 
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+		this_thread::sleep_for(std::chrono::milliseconds(1));
 	}
 
 	return 0;
