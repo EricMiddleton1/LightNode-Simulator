@@ -12,6 +12,8 @@ using namespace std;
 
 int main(int argc, char* argv[]) {
 	vector<std::shared_ptr<Light>> lights;
+	boost::asio::io_service ioService;
+	boost::asio::io_service::work ioWork{ioService};
 	
 	if(argc < 4) {
 		cout << "Usage: " << argv[0]
@@ -34,12 +36,12 @@ int main(int argc, char* argv[]) {
 	}
 
 	for(int i = 0; i < analogCount; ++i) {
-		lights.push_back(make_shared<VirtualLight>(string("Analog ") + to_string(i+1),
+		lights.push_back(make_shared<VirtualLight>(ioService, string("Analog ") + to_string(i+1),
 			1, 1, 1));
 	}
 
 	for(int i = 0; i < digitalCount; ++i) {
-		lights.push_back(make_shared<VirtualLight>(
+		lights.push_back(make_shared<VirtualLight>(ioService,
 			string("Digital ") + to_string(i+1), stoi(argv[i+4]), stoi(argv[i+4]), 1));
 	}
 
@@ -49,10 +51,15 @@ int main(int argc, char* argv[]) {
 		int width = stoi(argv[index]), height = stoi(argv[index+1]);
 
 		lights.push_back(std::make_shared<VirtualLight>
-			(string("Matrix ") + to_string(i+1), width*height, width, height));
+			(ioService, string("Matrix ") + to_string(i+1), width*height, width, height));
 	}
 
 	LightNode lightNode(lights, "LightNode-Simulator");
+
+	std::thread lightThread{[&ioService]() {
+		ioService.run();
+		std::cout << "[Info] ioService thread closing" << std::endl;
+	}};
 
 	while(true) {
 		bool run = true;

@@ -1,8 +1,9 @@
 #include "VirtualLight.hpp"
 
 
-VirtualLight::VirtualLight(const std::string& name, uint16_t ledCount, int width, int height)
-	:	Light{name, ledCount}
+VirtualLight::VirtualLight(boost::asio::io_service& _ioService, const std::string& name,
+	uint16_t ledCount, int width, int height)
+	:	Light{_ioService, name, ledCount}
 	,	window{name, width, height} {
 }
 

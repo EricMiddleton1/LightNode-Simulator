@@ -5,7 +5,8 @@
 
 class VirtualLight : public Light {
 public:
-	VirtualLight(const std::string& name, uint16_t ledCount, int width, int height);
+	VirtualLight(boost::asio::io_service& ioService, const std::string& name, uint16_t ledCount,
+		int width, int height);
 
 	bool windowUpdate();
 
