@@ -15,7 +15,13 @@ void VirtualLight::update() {
 	int ledIndex = 0;
 
 	for(const auto& led : leds) {
-		window.drawLED(ledIndex % window.getWidth(), ledIndex / window.getWidth(), led.getColor());
+		int x = ledIndex % window.getWidth(),
+			y = ledIndex / window.getWidth();
+
+		if(y & 0x01) {
+			x = window.getWidth() - x - 1;
+		}
+		window.drawLED(x, y, led.getColor());
 		ledIndex++;
 	}
 }
