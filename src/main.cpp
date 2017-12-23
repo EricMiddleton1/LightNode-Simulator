@@ -4,9 +4,9 @@
 #include <string>
 
 #include "LightNode/LightNode.hpp"
-#include "LightNode/Light.hpp"
 
 #include "VirtualLight.hpp"
+#include "VirtualMatrix.hpp"
 
 using namespace std;
 
@@ -36,22 +36,22 @@ int main(int argc, char* argv[]) {
 	}
 
 	for(int i = 0; i < analogCount; ++i) {
-		lights.push_back(make_shared<VirtualLight>(ioService, string("Analog ") + to_string(i+1),
-			1, 1, 1));
+		lights.push_back(make_shared<VirtualLight>(ioService, string("Analog ") +
+			to_string(i+1), 1));
 	}
 
 	for(int i = 0; i < digitalCount; ++i) {
 		lights.push_back(make_shared<VirtualLight>(ioService,
-			string("Digital ") + to_string(i+1), stoi(argv[i+4]), stoi(argv[i+4]), 1));
+			string("Digital ") + to_string(i+1), stoi(argv[i+4])));
 	}
 
 	for(int i = 0; i < matrixCount; ++i) {
 		int index = 4 + digitalCount + 2*i;
 
-		int width = stoi(argv[index]), height = stoi(argv[index+1]);
+		uint8_t width = stoi(argv[index]), height = stoi(argv[index+1]);
 
-		lights.push_back(std::make_shared<VirtualLight>
-			(ioService, string("Matrix ") + to_string(i+1), width*height, width, height));
+		lights.push_back(std::make_shared<VirtualMatrix>
+			(ioService, string("Matrix ") + to_string(i+1), width, height));
 	}
 
 	LightNode lightNode(lights, "LightNode-Simulator");
@@ -65,7 +65,13 @@ int main(int argc, char* argv[]) {
 		bool run = true;
 
 		for(auto light : lights) {
-			run &= dynamic_pointer_cast<VirtualLight>(light)->windowUpdate();
+			auto window = dynamic_pointer_cast<VirtualLight>(light);
+			if(window) {
+				run &= window->windowUpdate();
+			}
+			else {
+				run &= dynamic_pointer_cast<VirtualMatrix>(light)->windowUpdate();
+			}
 		}
 
 		if(!run)

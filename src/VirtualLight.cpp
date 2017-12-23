@@ -2,9 +2,9 @@
 
 
 VirtualLight::VirtualLight(boost::asio::io_service& _ioService, const std::string& name,
-	uint16_t ledCount, int width, int height)
+	uint16_t ledCount)
 	:	Light{_ioService, name, ledCount}
-	,	window{name, width, height} {
+	,	window{name, ledCount, 1} {
 }
 
 bool VirtualLight::windowUpdate() {
